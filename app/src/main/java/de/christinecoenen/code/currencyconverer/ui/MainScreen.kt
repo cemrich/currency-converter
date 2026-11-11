@@ -1,5 +1,6 @@
 package de.christinecoenen.code.currencyconverer.ui
 
+import android.icu.util.Currency
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,8 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,6 +33,41 @@ import de.christinecoenen.code.currencyconverer.ui.theme.CurrencyConvererTheme
 fun MainScreen(
 	modifier: Modifier = Modifier,
 ) {
+	// TODO: use viewmodel
+	var sourceAmountText by rememberSaveable { mutableStateOf("") }
+	var targetAmountText by rememberSaveable { mutableStateOf("") }
+	var sourceCurrency by rememberSaveable { mutableStateOf(Currency.getInstance("EUR")) }
+	var targetCurrency by rememberSaveable { mutableStateOf(Currency.getInstance("USD")) }
+
+	MainScreenContent(
+		sourceAmount = sourceAmountText,
+		targetAmount = targetAmountText,
+		sourceCurrency = sourceCurrency,
+		targetCurrency = targetCurrency,
+		onSourceAmountChanged = {
+			sourceAmountText = it
+			// TODO: calculate
+			targetAmountText = it
+		},
+		onSwapCurrencies = {
+			val swap = sourceCurrency
+			sourceCurrency = targetCurrency
+			targetCurrency = swap
+		},
+		modifier = modifier
+	)
+}
+
+@Composable
+fun MainScreenContent(
+	sourceAmount: String,
+	targetAmount: String,
+	sourceCurrency: Currency,
+	targetCurrency: Currency,
+	modifier: Modifier = Modifier,
+	onSourceAmountChanged: (String) -> Unit = {},
+	onSwapCurrencies: () -> Unit = {},
+) {
 	Card(
 		modifier
 			.fillMaxWidth()
@@ -41,11 +77,9 @@ fun MainScreen(
 			verticalArrangement = Arrangement.spacedBy(16.dp),
 			modifier = Modifier.padding(16.dp)
 		) {
-			var amountText by rememberSaveable { mutableStateOf("") }
-
 			OutlinedTextField(
-				value = amountText,
-				onValueChange = { amountText = it },
+				value = sourceAmount,
+				onValueChange = onSourceAmountChanged,
 				singleLine = true,
 				label = { Text(stringResource(R.string.label_amount)) },
 				keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -53,19 +87,19 @@ fun MainScreen(
 			)
 
 			Row(
-				horizontalArrangement = Arrangement.SpaceBetween,
+				horizontalArrangement = Arrangement.spacedBy(8.dp),
 				modifier = Modifier.fillMaxWidth()
 			) {
 				Button(
-					onClick = {}
+					onClick = {},
+					Modifier.weight(1f),
 				) {
-					Text("Currency 1")
+					Text(sourceCurrency.displayName)
 				}
 
-				IconButton(
-					onClick = {
-						// TODO: swap curencies
-					}
+				OutlinedIconButton(
+					onClick = onSwapCurrencies,
+					Modifier.weight(0.5f),
 				) {
 					Image(
 						painter = painterResource(R.drawable.baseline_swap_horiz_24),
@@ -74,9 +108,10 @@ fun MainScreen(
 				}
 
 				Button(
-					onClick = {}
+					onClick = {},
+					Modifier.weight(1f),
 				) {
-					Text("Currency 2")
+					Text(targetCurrency.displayName)
 				}
 			}
 
@@ -90,7 +125,7 @@ fun MainScreen(
 					modifier = Modifier.fillMaxWidth()
 				)
 				Text(
-					text = "45,23 €",
+					text = targetAmount,
 					textAlign = TextAlign.Center,
 					style = MaterialTheme.typography.displayMedium,
 					modifier = Modifier.fillMaxWidth()
@@ -104,6 +139,11 @@ fun MainScreen(
 @Composable
 fun MainScreenPreview() {
 	CurrencyConvererTheme {
-		MainScreen()
+		MainScreenContent(
+			sourceAmount = "15",
+			targetAmount = "17,34",
+			sourceCurrency = Currency.getInstance("EUR"),
+			targetCurrency = Currency.getInstance("USD"),
+		)
 	}
 }
