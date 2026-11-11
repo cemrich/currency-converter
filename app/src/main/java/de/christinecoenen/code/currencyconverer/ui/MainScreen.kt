@@ -117,7 +117,7 @@ fun MainScreenContent(
 					modifier = Modifier.fillMaxWidth()
 				)
 				Text(
-					text = targetAmount,
+					text = "$targetAmount ${targetCurrency.symbol}",
 					textAlign = TextAlign.Center,
 					style = MaterialTheme.typography.displayMedium,
 					modifier = Modifier.fillMaxWidth()
