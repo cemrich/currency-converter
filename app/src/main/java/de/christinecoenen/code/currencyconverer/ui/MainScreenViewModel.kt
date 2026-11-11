@@ -2,10 +2,16 @@ package de.christinecoenen.code.currencyconverer.ui
 
 import android.icu.util.Currency
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import de.christinecoenen.code.currencyconverer.services.ICurrencyService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import java.math.BigDecimal
 
-class MainScreenViewModel : ViewModel() {
+class MainScreenViewModel(
+	private val currencyService: ICurrencyService,
+) : ViewModel() {
 
 	private val _sourceAmountText = MutableStateFlow("")
 	val sourceAmountText = _sourceAmountText.asStateFlow()
@@ -20,15 +26,40 @@ class MainScreenViewModel : ViewModel() {
 	val targetCurrency = _targetCurrency.asStateFlow()
 
 	fun onSourceAmountChanged(amount: String) {
-		// TODO: validate amount
-		// TODO: calculate
 		_sourceAmountText.value = amount
-		_targetAmountText.value = amount
+
+		val parsedAmount = textToMoneyAmount(_sourceAmountText.value)
+
+		viewModelScope.launch {
+			// TODO: show loading state in ui as this may take a while
+			val converted = currencyService.convert(
+				sourceCurrencyCode = _sourceCurrency.value.currencyCode,
+				targetCurrencyCode = _targetCurrency.value.currencyCode,
+				amount = parsedAmount,
+			)
+
+			// TODO: proper formatting (locale aware, currency aware decimal palces)
+			_targetAmountText.value = converted.toString()
+		}
 	}
 
 	fun swapCurrencies() {
 		val swap = _sourceCurrency.value
 		_sourceCurrency.value = targetCurrency.value
 		_targetCurrency.value = swap
+	}
+
+	private fun textToMoneyAmount(text: String): BigDecimal {
+		// TODO: add locale aware decimal point handling
+		return if (text.isBlank()) {
+			BigDecimal.ZERO
+		} else {
+			try {
+				BigDecimal(text)
+			} catch (_: NumberFormatException) {
+				// TODO: raise errors to the ui (eg. when typing letters)
+				BigDecimal.ZERO
+			}
+		}
 	}
 }
