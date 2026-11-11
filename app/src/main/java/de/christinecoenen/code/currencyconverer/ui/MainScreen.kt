@@ -16,9 +16,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -26,34 +23,29 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.christinecoenen.code.currencyconverer.R
 import de.christinecoenen.code.currencyconverer.ui.theme.CurrencyConvererTheme
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun MainScreen(
 	modifier: Modifier = Modifier,
 ) {
-	// TODO: use viewmodel
-	var sourceAmountText by rememberSaveable { mutableStateOf("") }
-	var targetAmountText by rememberSaveable { mutableStateOf("") }
-	var sourceCurrency by rememberSaveable { mutableStateOf(Currency.getInstance("EUR")) }
-	var targetCurrency by rememberSaveable { mutableStateOf(Currency.getInstance("USD")) }
+	val viewModel: MainScreenViewModel = koinViewModel()
+
+	val sourceAmountText by viewModel.sourceAmountText.collectAsStateWithLifecycle()
+	val targetAmountText by viewModel.targetAmountText.collectAsStateWithLifecycle()
+	val sourceCurrency by viewModel.sourceCurrency.collectAsStateWithLifecycle()
+	val targetCurrency by viewModel.targetCurrency.collectAsStateWithLifecycle()
 
 	MainScreenContent(
 		sourceAmount = sourceAmountText,
 		targetAmount = targetAmountText,
 		sourceCurrency = sourceCurrency,
 		targetCurrency = targetCurrency,
-		onSourceAmountChanged = {
-			sourceAmountText = it
-			// TODO: calculate
-			targetAmountText = it
-		},
-		onSwapCurrencies = {
-			val swap = sourceCurrency
-			sourceCurrency = targetCurrency
-			targetCurrency = swap
-		},
+		onSourceAmountChanged = viewModel::onSourceAmountChanged,
+		onSwapCurrencies = viewModel::swapCurrencies,
 		modifier = modifier
 	)
 }
