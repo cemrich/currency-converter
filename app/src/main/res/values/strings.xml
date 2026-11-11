@@ -1,3 +1,7 @@
 <resources>
 	<string name="app_name">Currency Converer</string>
+
+	<string name="label_amount">Amount</string>
+	<string name="label_result">Result</string>
+	<string name="label_swap">swap</string>
 </resources>
