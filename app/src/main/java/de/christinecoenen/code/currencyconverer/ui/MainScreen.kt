@@ -127,7 +127,7 @@ fun MainScreenContent(
 					style = MaterialTheme.typography.labelMedium,
 					modifier = Modifier.fillMaxWidth()
 				)
-				// TODO: hide currency symbol when targetAmount is empty
+				
 				Text(
 					text = "$targetAmount ${targetCurrency.symbol}",
 					textAlign = TextAlign.Center,

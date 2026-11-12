@@ -19,7 +19,7 @@ class MainScreenViewModel(
 	private val _sourceAmountText = MutableStateFlow("")
 	val sourceAmountText = _sourceAmountText.asStateFlow()
 
-	private val _targetAmountText = MutableStateFlow("")
+	private val _targetAmountText = MutableStateFlow("0")
 	val targetAmountText = _targetAmountText.asStateFlow()
 
 	// TODO: make this nullable and initialize with a sane default value once availableCurrencies are loaded
