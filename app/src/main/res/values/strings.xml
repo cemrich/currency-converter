@@ -3,5 +3,6 @@
 
 	<string name="label_amount">Amount</string>
 	<string name="label_result">Result</string>
+	<string name="label_select_currency">Select a currency</string>
 	<string name="label_swap">swap</string>
 </resources>

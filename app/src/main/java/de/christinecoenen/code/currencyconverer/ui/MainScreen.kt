@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedIconButton
@@ -34,6 +33,7 @@ fun MainScreen(
 ) {
 	val viewModel: MainScreenViewModel = koinViewModel()
 
+	val availableCurrencies by viewModel.availableCurrencies.collectAsStateWithLifecycle()
 	val sourceAmountText by viewModel.sourceAmountText.collectAsStateWithLifecycle()
 	val targetAmountText by viewModel.targetAmountText.collectAsStateWithLifecycle()
 	val sourceCurrency by viewModel.sourceCurrency.collectAsStateWithLifecycle()
@@ -42,9 +42,12 @@ fun MainScreen(
 	MainScreenContent(
 		sourceAmount = sourceAmountText,
 		targetAmount = targetAmountText,
+		availableCurrencies = availableCurrencies,
 		sourceCurrency = sourceCurrency,
 		targetCurrency = targetCurrency,
 		onSourceAmountChanged = viewModel::onSourceAmountChanged,
+		onSourceCurrencyChanged = viewModel::onSourceCurrencyChanged,
+		onTargetCurrencyChanged = viewModel::onTargetCurrencyChanged,
 		onSwapCurrencies = viewModel::swapCurrencies,
 		modifier = modifier
 	)
@@ -54,10 +57,13 @@ fun MainScreen(
 fun MainScreenContent(
 	sourceAmount: String,
 	targetAmount: String,
+	availableCurrencies: List<Currency>,
 	sourceCurrency: Currency,
 	targetCurrency: Currency,
 	modifier: Modifier = Modifier,
 	onSourceAmountChanged: (String) -> Unit = {},
+	onSourceCurrencyChanged: (Currency) -> Unit = {},
+	onTargetCurrencyChanged: (Currency) -> Unit = {},
 	onSwapCurrencies: () -> Unit = {},
 ) {
 	Card(
@@ -69,6 +75,9 @@ fun MainScreenContent(
 			verticalArrangement = Arrangement.spacedBy(16.dp),
 			modifier = Modifier.padding(16.dp)
 		) {
+			// TODO: prohibit every input except digits and decimal places via InputTransformation
+			// TODO: restrict max length
+			// TODO: change to state based text field as described in https://developer.android.com/develop/ui/compose/text/user-input
 			OutlinedTextField(
 				value = sourceAmount,
 				onValueChange = onSourceAmountChanged,
@@ -78,17 +87,19 @@ fun MainScreenContent(
 				modifier = Modifier.fillMaxWidth()
 			)
 
+			// TODO: move currency selection into its own composable
 			Row(
 				horizontalArrangement = Arrangement.spacedBy(8.dp),
 				modifier = Modifier.fillMaxWidth()
 			) {
-				Button(
-					onClick = {},
-					Modifier.weight(1f),
-				) {
-					Text(sourceCurrency.displayName)
-				}
+				CurrencySelectionButton(
+					availableCurrencies = availableCurrencies,
+					selectedCurrency = sourceCurrency,
+					onCurrencySelected = onSourceCurrencyChanged,
+					modifier = Modifier.weight(1f)
+				)
 
+				// TODO: wrong icon tint in dark mode ui
 				OutlinedIconButton(
 					onClick = onSwapCurrencies,
 					Modifier.weight(0.5f),
@@ -99,12 +110,12 @@ fun MainScreenContent(
 					)
 				}
 
-				Button(
-					onClick = {},
-					Modifier.weight(1f),
-				) {
-					Text(targetCurrency.displayName)
-				}
+				CurrencySelectionButton(
+					availableCurrencies = availableCurrencies,
+					selectedCurrency = targetCurrency,
+					onCurrencySelected = onTargetCurrencyChanged,
+					modifier = Modifier.weight(1f)
+				)
 			}
 
 			Column(
@@ -116,6 +127,7 @@ fun MainScreenContent(
 					style = MaterialTheme.typography.labelMedium,
 					modifier = Modifier.fillMaxWidth()
 				)
+				// TODO: hide currency symbol when targetAmount is empty
 				Text(
 					text = "$targetAmount ${targetCurrency.symbol}",
 					textAlign = TextAlign.Center,
@@ -134,6 +146,7 @@ fun MainScreenPreview() {
 		MainScreenContent(
 			sourceAmount = "15",
 			targetAmount = "17,34",
+			availableCurrencies = Currency.getAvailableCurrencies().toList(),
 			sourceCurrency = Currency.getInstance("EUR"),
 			targetCurrency = Currency.getInstance("USD"),
 		)
