@@ -19,3 +19,6 @@ local.properties
 /.idea
 !/.idea/codeStyles
 !/.idea/inspectionProfiles
+
+# exclude releases
+app/release
