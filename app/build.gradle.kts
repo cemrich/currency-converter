@@ -23,7 +23,8 @@ android {
 	buildTypes {
 		release {
 			optimization {
-				enable = true
+				// TODO: enabling this will trigger a runtime error when passing the baseUrl to the RetrofitBuilder
+				enable = false
 				packageScope = setOf("androidx.**", "kotlin.**", "kotlinx.**")
 			}
 		}
@@ -48,6 +49,7 @@ dependencies {
 	implementation(libs.androidx.lifecycle.runtime.ktx)
 	implementation(libs.retrofit)
 	implementation(libs.retrofit.gson.converter)
+	implementation(libs.koin.androidx.compose)
 	testImplementation(libs.junit)
 	androidTestImplementation(platform(libs.androidx.compose.bom))
 	androidTestImplementation(libs.androidx.compose.ui.test.junit4)
@@ -55,5 +57,4 @@ dependencies {
 	androidTestImplementation(libs.androidx.junit)
 	debugImplementation(libs.androidx.compose.ui.test.manifest)
 	debugImplementation(libs.androidx.compose.ui.tooling)
-	debugImplementation(libs.koin.androidx.compose)
 }
