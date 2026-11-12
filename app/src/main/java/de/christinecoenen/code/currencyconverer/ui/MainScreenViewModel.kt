@@ -41,6 +41,30 @@ class MainScreenViewModel(
 	fun onSourceAmountChanged(amount: String) {
 		_sourceAmountText.value = amount
 
+		convert()
+	}
+
+	fun onSourceCurrencyChanged(currency: Currency) {
+		_sourceCurrency.value = currency
+
+		convert()
+	}
+
+	fun onTargetCurrencyChanged(currency: Currency) {
+		_targetCurrency.value = currency
+
+		convert()
+	}
+
+	fun swapCurrencies() {
+		val swap = _sourceCurrency.value
+		_sourceCurrency.value = targetCurrency.value
+		_targetCurrency.value = swap
+
+		convert()
+	}
+
+	private fun convert() {
 		val parsedAmount = textToMoneyAmount(_sourceAmountText.value)
 
 		viewModelScope.launch {
@@ -54,20 +78,6 @@ class MainScreenViewModel(
 			// TODO: proper formatting (locale aware, currency aware decimal places)
 			_targetAmountText.value = converted.toString()
 		}
-	}
-
-	fun onSourceCurrencyChanged(currency: Currency) {
-		_sourceCurrency.value = currency
-	}
-
-	fun onTargetCurrencyChanged(currency: Currency) {
-		_targetCurrency.value = currency
-	}
-
-	fun swapCurrencies() {
-		val swap = _sourceCurrency.value
-		_sourceCurrency.value = targetCurrency.value
-		_targetCurrency.value = swap
 	}
 
 	private fun textToMoneyAmount(text: String): BigDecimal {
