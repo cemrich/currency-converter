@@ -33,6 +33,7 @@ class MainScreenViewModel(
 	init {
 		viewModelScope.launch {
 			// TODO: show loading state in ui as this may take a while
+			// TODO: handle api and network errors
 			_availableCurrencies.value = currencyService.getAvailableCurrencies()
 		}
 	}

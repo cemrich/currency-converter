@@ -1,15 +1,25 @@
 package de.christinecoenen.code.currencyconverer.di
 
 import de.christinecoenen.code.currencyconverer.api.IExchangeApi
-import de.christinecoenen.code.currencyconverer.api.MockExchangeApi
 import de.christinecoenen.code.currencyconverer.services.CurrencyService
 import de.christinecoenen.code.currencyconverer.services.ICurrencyService
 import de.christinecoenen.code.currencyconverer.ui.MainScreenViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+
 
 val appModule = module {
-	single<IExchangeApi> { MockExchangeApi() }
+	val retrofit = Retrofit.Builder()
+		// TODO: move URL to config
+		// TODO: add logging
+		// TODO: add fallback mechanism as described in https://github.com/fawazahmed0/exchange-api
+		.baseUrl("https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/")
+		.addConverterFactory(GsonConverterFactory.create())
+		.build()
+
+	single<IExchangeApi> { retrofit.create(IExchangeApi::class.java) }
 	single<ICurrencyService> { CurrencyService(get()) }
 
 	viewModel { MainScreenViewModel(get()) }
