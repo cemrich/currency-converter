@@ -127,7 +127,7 @@ fun MainScreenContent(
 					style = MaterialTheme.typography.labelMedium,
 					modifier = Modifier.fillMaxWidth()
 				)
-				
+
 				Text(
 					text = "$targetAmount ${targetCurrency.symbol}",
 					textAlign = TextAlign.Center,
@@ -135,6 +135,8 @@ fun MainScreenContent(
 					modifier = Modifier.fillMaxWidth()
 				)
 			}
+
+			// TODO: Display conversion rate, its source and date
 		}
 	}
 }
