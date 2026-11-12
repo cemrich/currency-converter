@@ -21,11 +21,22 @@ class CurrencyService(
 			.filter { androidCurrency -> availableCurrencyKeys.contains(androidCurrency.currencyCode.lowercase()) }
 	}
 
+	// TODO: unit test
 	override suspend fun convert(
 		sourceCurrencyCode: String,
 		amount: BigDecimal,
 		targetCurrencyCode: String
 	): BigDecimal {
-		return amount.multiply(BigDecimal("2"))
+		// TODO: cache result for at least a day to avoid hitting the api too often
+		// TODO: handle api and network errors
+		// TODO: throw dedicated service error objects
+		val exchangeRates = exchangeApi
+			.getExchangeRates(sourceCurrencyCode.lowercase())
+			.conversions
+
+		val exchangeRate = exchangeRates[targetCurrencyCode.lowercase()]
+			?: throw Error("Target exchange rate $targetCurrencyCode not found in api result.")
+
+		return amount.multiply(exchangeRate)
 	}
 }
