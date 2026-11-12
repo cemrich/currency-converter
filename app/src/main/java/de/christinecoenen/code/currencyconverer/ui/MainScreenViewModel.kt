@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
+import java.text.DecimalFormat
 
 class MainScreenViewModel(
 	private val currencyService: ICurrencyService,
@@ -75,8 +76,10 @@ class MainScreenViewModel(
 				amount = parsedAmount,
 			)
 
-			// TODO: proper formatting (locale aware, currency aware decimal places)
-			_targetAmountText.value = converted.toString()
+			// TODO: this formatting is not applied before the first conversion
+			// TODO: currency aware formatting for number of decimal places
+			val format = DecimalFormat("#,##0.00")
+			_targetAmountText.value = format.format(converted)
 		}
 	}
 
