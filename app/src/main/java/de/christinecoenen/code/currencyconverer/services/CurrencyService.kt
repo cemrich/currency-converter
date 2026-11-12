@@ -6,6 +6,7 @@ import java.math.BigDecimal
 
 class CurrencyService(
 	private val exchangeApi: IExchangeApi,
+	private val exchangeRateCache: IExchangeRateCache,
 ) : ICurrencyService {
 
 	// TODO: unit test
@@ -27,15 +28,20 @@ class CurrencyService(
 		amount: BigDecimal,
 		targetCurrencyCode: String
 	): BigDecimal {
-		// TODO: cache result for at least a day to avoid hitting the api too often
-		// TODO: handle api and network errors
-		// TODO: throw dedicated service error objects
-		val exchangeRates = exchangeApi
-			.getExchangeRates(sourceCurrencyCode.lowercase())
-			.conversions
+		var exchangeRate = exchangeRateCache.get(sourceCurrencyCode, targetCurrencyCode)
 
-		val exchangeRate = exchangeRates[targetCurrencyCode.lowercase()]
-			?: throw Error("Target exchange rate $targetCurrencyCode not found in api result.")
+		if (exchangeRate == null) {
+			// TODO: handle api and network errors
+			// TODO: throw dedicated service error objects
+			val exchangeRates = exchangeApi
+				.getExchangeRates(sourceCurrencyCode.lowercase())
+				.conversions
+
+			exchangeRate = exchangeRates[targetCurrencyCode.lowercase()]
+				?: throw Error("Target exchange rate $targetCurrencyCode not found in api result.")
+
+			exchangeRateCache.put(sourceCurrencyCode, targetCurrencyCode, exchangeRate)
+		}
 
 		return amount.multiply(exchangeRate)
 	}

@@ -5,7 +5,9 @@ import de.christinecoenen.code.currencyconverer.api.ExchangeRateResponse
 import de.christinecoenen.code.currencyconverer.api.ExchangeRateResponseDeserializer
 import de.christinecoenen.code.currencyconverer.api.IExchangeApi
 import de.christinecoenen.code.currencyconverer.services.CurrencyService
+import de.christinecoenen.code.currencyconverer.services.IExchangeRateCache
 import de.christinecoenen.code.currencyconverer.services.ICurrencyService
+import de.christinecoenen.code.currencyconverer.services.InMemoryExchangeRateCache
 import de.christinecoenen.code.currencyconverer.ui.MainScreenViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -31,7 +33,8 @@ val appModule = module {
 		.build()
 
 	single<IExchangeApi> { retrofit.create(IExchangeApi::class.java) }
-	single<ICurrencyService> { CurrencyService(get()) }
+	single<IExchangeRateCache> { InMemoryExchangeRateCache() }
+	single<ICurrencyService> { CurrencyService(get(), get()) }
 
 	viewModel { MainScreenViewModel(get()) }
 }
